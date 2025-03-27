@@ -1,4 +1,4 @@
-import polars as pl
+import re, polars as pl
 
 class EventData:
     def __init__(self, tour:str, slam:str, year:int):
@@ -34,9 +34,9 @@ class EventData:
             return pl.DataFrame()
         else:
             data = data.with_columns(
-                P1Score = pl.col("P1Score").map_elements(lambda x: 45 if str(x) == "AD" else int(x), return_dtype=pl.Int32),
-                P2Score = pl.col("P2Score").map_elements(lambda x: 45 if str(x) == "AD" else int(x), return_dtype=pl.Int32),
-                PointNumber = pl.col("PointNumber").map_elements(lambda x: 0 if str(x).startswith("0") else int(x), return_dtype=pl.Int32),
+                P1Score = pl.col("P1Score").map_elements(lambda x: 45 if str(x) == "AD" else 0 if isinstance(x, str) else int(x), return_dtype=pl.Int32),
+                P2Score = pl.col("P2Score").map_elements(lambda x: 45 if str(x) == "AD" else 0 if isinstance(x, str) else int(x), return_dtype=pl.Int32),
+                PointNumber = pl.col("PointNumber").map_elements(lambda x: int(re.sub("[A-Z]", "", str(x))), return_dtype=pl.Int32),
             )
             return data
     
@@ -121,12 +121,20 @@ class EventData:
         return event.select([i for i in output_cols if i in event.columns])
 
 if __name__ == "__main__":
+    from time import time
+    app_start = time()
     tournaments = ["Australian Open", "French Open", "Wimbledon", "US Open"]
     years = list(range(2011, 2025))
 
     tour_map = [(i, j) for i in tournaments for j in years]
     for event, year in tour_map:
+        start = time()
         res = EventData("atp", event, year).get_results()
         
-        if not res.is_empty():
-            res.write_parquet(f"data/events/atp-{event.replace(" ", "").lower()}-{year}.parquet")
+        end = time()
+        print(f"{year} {event} processed in {end - start}s")
+
+        # if not res.is_empty():
+        #     res.write_parquet(f"data/events/atp-{event.replace(" ", "").lower()}-{year}.parquet")
+
+    print(f"total run : {time() - app_start} s")

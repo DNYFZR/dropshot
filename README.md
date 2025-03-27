@@ -2,7 +2,7 @@
 
 <h3 align="center">rebuild in progress...</h3>
 
-- ticmatches pipeline to consolidate ATP & WTA tour results ✔ 
+- matches pipeline to consolidate ATP & WTA tour results ✔ 
 
 - dropshot neural model trained on 10 years of Grand Slam data ✔ 
 
