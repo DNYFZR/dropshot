@@ -134,7 +134,7 @@ if __name__ == "__main__":
         end = time()
         print(f"{year} {event} processed in {end - start}s")
 
-        # if not res.is_empty():
-        #     res.write_parquet(f"data/events/atp-{event.replace(" ", "").lower()}-{year}.parquet")
+        if not res.is_empty():
+            res.write_parquet(f"data/events/atp-{event.replace(" ", "").lower()}-{year}.parquet")
 
     print(f"total run : {time() - app_start} s")
